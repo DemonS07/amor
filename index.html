@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sorpresa Especial Koya</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* PALETA DE COLORES DE KOYA */
+    :root {
+      --bg-purple: #8a5cb6;       /* Morado del fondo */
+      --card-blue: #bbe2fb;       /* Azul claro suave para tarjeta */
+      --koya-blue: #87cefa;       /* Azul distintivo de Koya */
+      --dark-purple: #5e3b87;     /* Morado oscuro de la nariz/detalles */
+      --border-purple: #5e3b87;   /* Bordes definidos estilo Koya */
+      --text-color: #3b1e5a;      /* Texto principal */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Fredoka', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-purple);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ELEMENTOS CAYENDO (CORAZONES/ESTRELLAS) */
+    .falling-element {
+      position: fixed;
+      top: -10%;
+      user-select: none;
+      pointer-events: none;
+      z-index: 0;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    .container {
+      width: 100%;
+      max-width: 800px;
+      min-height: 520px;
+      background-color: var(--card-blue);
+      border: 4px solid var(--border-purple);
+      border-radius: 28px;
+      box-shadow: 0 10px 25px rgba(60, 20, 100, 0.3);
+      padding: 30px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      height: 100%;
+      animation: fadeIn 0.4s ease-in-out;
+      position: relative;
+    }
+
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* TITULOS CORREGIDOS */
+    h1 {
+      font-size: 2.2rem;
+      color: var(--dark-purple);
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      text-shadow: 
+        -2px -2px 0 #ffffff,  
+         2px -2px 0 #ffffff,
+        -2px  2px 0 #ffffff,
+         2px  2px 0 #ffffff;
+    }
+
+    /* Margen superior para los títulos en pantallas con botón de regresar */
+    .sub-screen h1 {
+      margin-top: 25px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: var(--dark-purple);
+      font-weight: 600;
+    }
+
+    /* BOTONES */
+    .btn {
+      background-color: var(--koya-blue);
+      color: var(--dark-purple);
+      border: 3px solid var(--border-purple);
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin: 10px;
+      box-shadow: 0 4px 0px var(--border-purple);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0px var(--border-purple);
+      background-color: #62b2e8;
+    }
+
+    .btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0px var(--border-purple);
+    }
+
+    .btn-secondary {
+      background-color: #ffffff;
+      color: var(--dark-purple);
+    }
+
+    /* BOTÓN VOLVER BAJADO Y MEJOR POSICIONADO */
+    .btn-back {
+      position: absolute;
+      top: -20px;
+      left: 10px;
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      z-index: 10;
+      margin: 0;
+    }
+
+    /* TARJETAS DEL MENÚ */
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      width: 100%;
+      max-width: 500px;
+      margin-top: 20px;
+    }
+
+    .card-item {
+      background-color: #ffffff;
+      border: 3px solid var(--border-purple);
+      border-radius: 20px;
+      padding: 20px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      box-shadow: 0 4px 0px var(--border-purple);
+    }
+
+    .card-item:hover {
+      transform: scale(1.05);
+    }
+
+    .card-item h3 {
+      color: var(--dark-purple);
+      margin-top: 8px;
+    }
+
+    .koya-avatar {
+      width: 130px;
+      height: 130px;
+      margin-bottom: 15px;
+      object-fit: contain;
+    }
+
+    .spotify-container {
+      width: 100%;
+      max-width: 400px;
+      margin-top: 15px;
+    }
+
+    /* ESTILOS DE LA GALERÍA DE FOTOS */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+      width: 100%;
+      max-width: 650px;
+      max-height: 380px;
+      overflow-y: auto;
+      padding: 10px;
+      margin-top: 10px;
+    }
+
+    .gallery-grid::-webkit-scrollbar {
+      width: 8px;
+    }
+    .gallery-grid::-webkit-scrollbar-thumb {
+      background: var(--dark-purple);
+      border-radius: 10px;
+    }
+
+    .photo-card {
+      background-color: #ffffff;
+      border: 3px solid var(--border-purple);
+      border-radius: 16px;
+      padding: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 0px var(--border-purple);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .photo-card:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 8px 0px var(--border-purple);
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .photo-caption {
+      font-size: 0.85rem;
+      color: var(--dark-purple);
+      font-weight: 600;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    /* MODAL / VISOR EN PANTALLA COMPLETA */
+    .photo-modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(59, 30, 90, 0.85);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .modal-content {
+      max-width: 85%;
+      max-height: 70vh;
+      border: 4px solid #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-caption {
+      color: #ffffff;
+      font-size: 1.2rem;
+      margin-top: 12px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 35px;
+      color: #ffffff;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div id="screen1" class="screen active">
+      <img src="los dos.png" class="koya-avatar" alt="Koya">
+      <h1>¡Felices 5 Meses Mi Amor!</h1>
+      <p>¿Quieres ver tu sorpresa?</p>
+      <div>
+        <button class="btn btn-secondary" onclick="irA('screen2')">No, come colita</button>
+        <button class="btn" onclick="irA('screen3')">Claro que si precioso</button>
+      </div>
+    </div>
+
+    <div id="screen2" class="screen">
+      <img src="koala.png" class="koya-avatar" alt="Koya triste" style="filter: grayscale(40%);">
+      <h1>¡Por favor, te gustará!</h1>
+      <p>Di que sí por favor...</p>
+      <button class="btn" onclick="irA('screen3')">Está bien, solo esta vez</button>
+    </div>
+
+    <div id="screen3" class="screen">
+      <h1>¡Sorpresaaa mi amor!</h1>
+      <p>Haz clic en cada una de las opciones:</p>
+
+      <div class="grid-cards">
+        <div class="card-item" onclick="irA('screen-frases')">
+          <span style="font-size: 2.5rem;">💜</span>
+          <h3>Mensajitos</h3>
+        </div>
+        <div class="card-item" onclick="irA('screen-playlist')">
+          <span style="font-size: 2.5rem;">🎵</span>
+          <h3>Nuestra Playlist</h3>
+        </div>
+        <div class="card-item" onclick="irA('screen-fotos')">
+          <span style="font-size: 2.5rem;">📸</span>
+          <h3>Fotos</h3>
+        </div>
+        <div class="card-item" onclick="irA('screen-dedicatoria')">
+          <span style="font-size: 2.5rem;">💌</span>
+          <h3>Carta</h3>
+        </div>
+      </div>
+    </div>
+
+    <div id="screen-frases" class="screen sub-screen">
+      <button class="btn btn-back" onclick="irA('screen3')">← Volver</button>
+      <h1>Todo esto es para ti</h1>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-width: 500px; margin-top: 10px;">
+        <span class="btn btn-secondary">Te amo mucho</span>
+        <span class="btn btn-secondary">Eres la mejor niña</span>
+        <span class="btn btn-secondary">Me gustas demasiado</span>
+        <span class="btn btn-secondary">Eres todo lo bonito de este world</span>
+        <span class="btn btn-secondary">Si es necesario, te diria mil veces lo mucho que me haces feliz</span>
+      </div>
+    </div>
+
+    <div id="screen-playlist" class="screen sub-screen">
+      <button class="btn btn-back" onclick="irA('screen3')">← Volver</button>
+      <h1>Nuestra Playlist 🎵</h1>
+      <p>Canciones que me recuerdan a ti:</p>
+      
+      <div class="spotify-container">
+        <iframe style="border-radius:12px" 
+                src="https://open.spotify.com/embed/playlist/2xeZeCANc1GFAfJPyopiVt" 
+                width="100%" 
+                height="352" 
+                frameBorder="0" 
+                allowfullscreen="" 
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                loading="lazy">
+        </iframe>
+      </div>
+    </div>
+
+    <div id="screen-fotos" class="screen sub-screen">
+      <button class="btn btn-back" onclick="irA('screen3')">← Volver</button>
+      <h1>Nuestros Momentos 📸</h1>
+      <p>Cada foto con un recuerdo especial contigo ❤️</p>
+
+      <div class="gallery-grid">
+        <div class="photo-card" onclick="verFoto(this)">
+          <img src="1.jpg" alt="Momento 1">
+          <span class="photo-caption">Nuestra primera foto ✨</span>
+        </div>
+        
+        <div class="photo-card" onclick="verFoto(this)">
+          <img src="2.jpg" alt="Momento 2">
+          <span class="photo-caption">Un abrazo inolvidable 🌸</span>
+        </div>
+
+        <div class="photo-card" onclick="verFoto(this)">
+          <img src="3.jpeg" alt="Momento 3">
+          <span class="photo-caption">De mis momentos favoritos 💕</span>
+        </div>
+
+        <div class="photo-card" onclick="verFoto(this)">
+          <img src="4.jpg" alt="Momento 4">
+          <span class="photo-caption">Siempre juntos 💜</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="screen-dedicatoria" class="screen sub-screen">
+      <button class="btn btn-back" onclick="irA('screen3')">← Volver</button>
+      <h1>Te dedico esto con mucho amor</h1>
+      <p style="max-width: 520px; line-height: 1.6; text-align: justify; margin-top: 10px; max-height: 350px; overflow-y: auto; padding-right: 5px;">
+        Para empezar, quiero decirte gracias. Gracias por formar parte de mi vida y por crear a mi lado momentos tan únicos e inolvidables. Te has convertido en una pieza fundamental en mi mundo.<br><br>
+        A lo largo de estos 5 meses me he dado cuenta de algo hermoso: cada día te amo un poco más. Eres esa persona a la que le confío todo a ojos cerrados y con quien realmente me veo construyendo un futuro.<br><br>
+        Pido disculpas si en algún momento he cometido errores; jamás ha sido mi intención hacerte sentir mal o actuar mal, a veces simplemente se me escapan las cosas sin pensar.<br><br>
+        Mi amor, por mí te escribiría un millón de cartas más, pero por ahora quiero recordarte esto: gracias por estar en mi vida, por hacer que cada día sea especial y por ser la persona tan increíble que eres. Te amo.
+      </p>
+    </div>
+
+  </div>
+
+  <div id="photoModal" class="photo-modal" onclick="cerrarFoto()">
+    <span class="close-modal">×</span>
+    <img id="modalImg" class="modal-content" alt="Foto en grande">
+    <div id="modalCaption" class="modal-caption"></div>
+  </div>
+
+  <script>
+    function irA(pantallaId) {
+      const pantallas = document.querySelectorAll('.screen');
+      pantallas.forEach(p => p.classList.remove('active'));
+
+      const seleccionada = document.getElementById(pantallaId);
+      if (seleccionada) {
+        seleccionada.classList.add('active');
+      }
+    }
+
+    // FUNCIONES PARA ABRIR Y CERRAR FOTOS EN GRANDE
+    function verFoto(elementoCard) {
+      const modal = document.getElementById("photoModal");
+      const modalImg = document.getElementById("modalImg");
+      const modalCaption = document.getElementById("modalCaption");
+      
+      const img = elementoCard.querySelector("img");
+      const caption = elementoCard.querySelector(".photo-caption");
+
+      modal.style.display = "flex";
+      modalImg.src = img.src;
+      modalCaption.innerText = caption ? caption.innerText : "";
+    }
+
+    function cerrarFoto() {
+      document.getElementById("photoModal").style.display = "none";
+    }
+
+    // ANIMACIÓN DE ELEMENTOS CAYENDO EN EL FONDO
+    function crearElementoFondo() {
+      const el = document.createElement('div');
+      el.classList.add('falling-element');
+      
+      const simbolos = ['💜', '💙', '⭐', '✨', '💤'];
+      el.innerText = simbolos[Math.floor(Math.random() * simbolos.length)];
+
+      el.style.left = Math.random() * 100 + 'vw';
+      const size = Math.random() * 18 + 14;
+      el.style.fontSize = size + 'px';
+
+      const duration = Math.random() * 3 + 3;
+      el.style.animationDuration = duration + 's';
+
+      document.body.appendChild(el);
+
+      setTimeout(() => {
+        el.remove();
+      }, duration * 1000);
+    }
+
+    setInterval(crearElementoFondo, 300);
+  </script>
+</body>
+</html>
